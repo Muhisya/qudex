@@ -17,9 +17,9 @@ const initialState = {
   loading: false,
   error: null,
   searchTerm: '',
-  bookmarks: JSON.parse(localStorage.getItem('qurex_bookmarks')) || [],
-  lastRead: JSON.parse(localStorage.getItem('qurex_lastread')) || null,
-  darkMode: JSON.parse(localStorage.getItem('qurex_dark')) || false,
+  bookmarks: JSON.parse(localStorage.getItem('qudex_bookmarks')) || [],
+  lastRead: JSON.parse(localStorage.getItem('qudex_lastread')) || null,
+  darkMode: JSON.parse(localStorage.getItem('qudex_dark')) || false,
 };
 
 const quranSlice = createSlice({
@@ -36,27 +36,42 @@ const quranSlice = createSlice({
       } else {
         state.bookmarks.push(action.payload);
       }
-      localStorage.setItem('qurex_bookmarks', JSON.stringify(state.bookmarks));
+      localStorage.setItem('qudex_bookmarks', JSON.stringify(state.bookmarks));
     },
     setLastRead: (state, action) => {
       state.lastRead = action.payload;
-      localStorage.setItem('qurex_lastread', JSON.stringify(action.payload));
+      localStorage.setItem('qudex_lastread', JSON.stringify(action.payload));
     },
     toggleDarkMode: (state) => {
       state.darkMode = !state.darkMode;
-      localStorage.setItem('qurex_dark', JSON.stringify(state.darkMode));
+      localStorage.setItem('qudex_dark', JSON.stringify(state.darkMode));
     }
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllSurah.pending, (state) => { state.loading = true; })
+      .addCase(getAllSurah.pending, (state) => { 
+        state.loading = true; 
+        state.error = null;
+      })
       .addCase(getAllSurah.fulfilled, (state, action) => {
         state.loading = false;
         state.surahList = action.payload;
       })
+      .addCase(getAllSurah.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(getSurahDetail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(getSurahDetail.fulfilled, (state, action) => {
         state.loading = false;
         state.detailSurah = action.payload;
+      })
+      .addCase(getSurahDetail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });
